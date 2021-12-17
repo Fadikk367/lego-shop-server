@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import morgan from 'morgan';
 
 import Controller from './Controller';
 
@@ -23,6 +24,7 @@ export default class App {
   }
 
   private initializeMiddlewares(): void {
+    this.app.use(morgan('common'));
     this.app.use(cors());
     this.app.use(express.json());
   }

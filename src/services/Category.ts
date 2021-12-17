@@ -1,4 +1,4 @@
-import session from '../db';
+import getSession from '../db';
 
 export interface Category {
   id: number;
@@ -20,32 +20,48 @@ class CategoryService {
   }
 
   async createCategory(name: string): Promise<Category> {
-    const result = await session.run(
-      'CREATE (category:Category {name: $categoryName}) RETURN ID(category) as id, category.name as name', 
-      { categoryName: name },
-    );
+    const session = getSession();
 
-    const records = result.records.map(record => {
-      return {
-        id: record.get('id').toNumber(),
-        name: record.get('name'),
-      };
-    })
-
-    return records[0];
+    try {
+      const result = await session.run(
+        'CREATE (category:Category {name: $categoryName}) RETURN ID(category) as id, category.name as name', 
+        { categoryName: name },
+      );
+  
+      const records = result.records.map(record => {
+        return {
+          id: record.get('id').toNumber(),
+          name: record.get('name'),
+        };
+      })
+  
+      return records[0];
+    } catch (_) {
+      throw new Error('Failed to query db');
+    } finally {
+      session.close();
+    }
   }
 
   async getAllCategories(): Promise<Category[]> {
-    const result = await session.run('MATCH (category:Category) RETURN ID(category) as id, category.name as name');
+    const session = getSession();
 
-    const categories: Category[] = result.records.map(record => {
-      return {
-        id: record.get('id').toNumber(),
-        name: record.get('name'),
-      }
-    });
+    try {
+      const result = await session.run('MATCH (category:Category) RETURN ID(category) as id, category.name as name');
 
-    return categories;
+      const categories: Category[] = result.records.map(record => {
+        return {
+          id: record.get('id').toNumber(),
+          name: record.get('name'),
+        }
+      });
+  
+      return categories;
+    } catch (_) {
+      throw new Error('Failed to query db');
+    } finally {
+      session.close();
+    }
   }
 }
 

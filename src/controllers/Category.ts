@@ -29,8 +29,6 @@ class CategoryController extends Controller {
   }
 
   private getCategories = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    console.log({body: req.body});
-
     try {
       const result = await this.categoryService.getAllCategories();
       res.json(result);
