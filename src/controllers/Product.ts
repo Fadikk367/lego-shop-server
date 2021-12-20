@@ -14,7 +14,8 @@ class ProductController extends Controller {
 
   protected initializeRoutes(): void {
     this.router.get('/', this.getProducts);
-    this.router.get('/most-rated', this.mostRated);
+    this.router.get('/best-rated', this.mostRated);
+    this.router.get('/recommended', this.recommended);
     this.router.get('/:id', this.getOne);
     this.router.post('/', this.createProduct);
     this.router.post('/:id/rate', this.rateProduct);
@@ -77,6 +78,17 @@ class ProductController extends Controller {
 
     try {
       const result = await this.productService.alsoBought(productId);
+      res.json(result);
+    } catch(err) {
+      next(err);
+    }
+  }
+
+  private recommended = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const userId = parseInt(req.query.user as string);
+
+    try {
+      const result = await this.productService.recommendedForUser(userId);
       res.json(result);
     } catch(err) {
       next(err);
